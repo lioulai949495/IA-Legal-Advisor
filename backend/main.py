@@ -1,6 +1,6 @@
 from fastapi import FastAPI
-from .database import engine, Base
-from . import models
+from database import engine, Base
+import models
 
 # 在应用启动时，根据我们的模型创建数据库表
 models.Base.metadata.create_all(bind=engine)
