@@ -39,6 +39,13 @@ def get_ai_response(user_selection: str) -> dict:
         response = model.generate_content(prompt)
         raw_text = response.text.strip()
 
+        # 新增：清理Markdown代码块的逻辑
+        if raw_text.startswith("```json"): 
+            raw_text = raw_text[7:] # 去掉开头的 ```json
+            if raw_text.endswith("```"): 
+                raw_text = raw_text[:-3] # 去掉结尾的 ```
+            raw_text = raw_text.strip() # 再清理一下可能存在的空格
+
         # 增加安全检查，确保返回的文本看起来像JSON
         if not raw_text.startswith('{') or not raw_text.endswith('}'):
             print(f"AI返回了非JSON格式的文本: {raw_text}")
