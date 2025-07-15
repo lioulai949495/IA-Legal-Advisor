@@ -30,7 +30,7 @@ async def verify_token(x_token: str = Header(None)):
 
 @app.get("/")
 def read_root():
-    return {"message": "IA法律顾问后端服务已成功启动！数据库已连接。"}
+    return {"message": "IA法律顾问后端服务 v1.1 已成功启动！数据库已连接。"}
 
 @app.post("/send-code")
 def send_verification_code(request: schemas.PhoneRequest):
