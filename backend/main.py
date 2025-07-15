@@ -74,6 +74,6 @@ def get_subtypes(request: schemas.ChatRequest, token: str = Depends(verify_token
 
 @app.post("/chat")
 def chat_with_ai(request: schemas.ChatRequest, token: str = Depends(verify_token)):
-    if not all([request.role, request.subtype, request.message]):
-        raise HTTPException(status_code=400, detail="Category, role, subtype, and message are required")
+    if not all([request.category, request.role, request.subtype, request.message]):
+        raise HTTPException(status_code=400, detail="Category, role, subtype, and message are required for a full analysis")
     return ai_services.get_ai_response(request.category, request.role, request.subtype, request.message)
