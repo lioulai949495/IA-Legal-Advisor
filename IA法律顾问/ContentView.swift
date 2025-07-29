@@ -11,20 +11,18 @@ struct ContentView: View {
     @State private var phoneNumber: String = ""
     @State private var verificationCode: String = ""
     @State private var infoMessage: String = ""
-    @State private var isLoading: Bool = false // 用于显示加载状态
+    @State private var isLoading: Bool = false
     
-    // 登录成功后，我们将跳转到聊天界面
     @State private var isLoggedIn: Bool = false
-    @State private var authToken: String = "" // 保存获取到的Token
+    @State private var authToken: String = ""
 
     var body: some View {
-        if isLoggedIn {
-            // 如果已登录，显示聊天界面 (我们将在下一步创建)
-            // Text("登录成功！Token: \(authToken)")
-            ChatView(authToken: $authToken)
-        } else {
-            // 如果未登录，显示登录界面
-            loginView
+        NavigationView { // 使用NavigationView来实现页面跳转
+            if isLoggedIn {
+                ChatView(authToken: $authToken)
+            } else {
+                loginView
+            }
         }
     }
     
@@ -79,9 +77,11 @@ struct ContentView: View {
             Spacer()
         }
         .padding()
+        .navigationTitle("") // 隐藏登录页的标题
+        .navigationBarHidden(true)
     }
     
-    // 发送验证码按钮的动作
+    // ... (sendCodeAction 和 loginAction 函数保持不变)
     func sendCodeAction() {
         isLoading = true
         infoMessage = ""
@@ -98,7 +98,6 @@ struct ContentView: View {
         }
     }
     
-    // 登录按钮的动作
     func loginAction() {
         isLoading = true
         infoMessage = ""
@@ -109,7 +108,6 @@ struct ContentView: View {
                 case .success(let token):
                     self.infoMessage = "登录成功！"
                     self.authToken = token
-                    // 延迟一秒后跳转，给用户看清提示的时间
                     DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                         self.isLoggedIn = true
                     }
@@ -118,14 +116,6 @@ struct ContentView: View {
                 }
             }
         }
-    }
-}
-
-// 为了预览，我们还需要一个空的ChatView
-struct ChatView: View {
-    @Binding var authToken: String
-    var body: some View {
-        Text("聊天界面，Token: \(authToken)")
     }
 }
 

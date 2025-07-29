@@ -187,11 +187,10 @@
 				};
 			};
 			buildConfigurationList = F612EA742E25D575005E8507 /* Build configuration list for PBXProject "IA法律顾问" */;
-			developmentRegion = en;
+			developmentRegion = "zh-Hans";
 			hasScannedForEncodings = 0;
 			knownRegions = (
-				en,
-				Base,
+				"zh-Hans",
 			);
 			mainGroup = F612EA702E25D575005E8507;
 			minimizedProjectReferenceProxies = 1;

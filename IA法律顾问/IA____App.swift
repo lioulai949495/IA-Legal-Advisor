@@ -3,10 +3,11 @@
 import SwiftUI
 
 @main
-struct ___PACKAGENAME:identifier___App: App {
+struct IA____App: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            UIDesignCanvas() // 临时将入口指向我们的设计画板
         }
     }
 }
+

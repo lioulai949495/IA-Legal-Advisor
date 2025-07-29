@@ -33,7 +33,7 @@ def read_root():
 def send_verification_code(request: schemas.PhoneRequest):
     # ... (此部分代码不变)
     phone_number = request.phone_number
-    code = str(random.randint(100000, 999999))
+    code = "123456"  # 临时固定验证码用于测试
     verification_codes[phone_number] = code
     print(f"发送验证码到 {phone_number}: {code}")
     return {"message": f"验证码已发送到 {phone_number}"}
@@ -74,7 +74,6 @@ def get_subtypes(request: schemas.ChatRequest, token: str = Depends(verify_token
 
 @app.post("/chat")
 def chat_with_ai(request: schemas.ChatRequest, token: str = Depends(verify_token)):
-    if not all([request.category, request.role, request.subtype, request.message]):
-        raise HTTPException(status_code=400, detail="Category, role, subtype, and message are required for a full analysis")
-    return ai_services.get_ai_response(request.category, request.role, request.subtype, request.message)
+    # Canary Test: Return a hardcoded message to verify deployment.
+    return {"message": "Canary test successful: chat endpoint is live!"}
 
