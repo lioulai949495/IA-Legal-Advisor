@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Depends, HTTPException, Header
 from sqlalchemy.orm import Session
 import random
+import time
 
 import models
 import schemas
@@ -11,6 +12,7 @@ models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
+start_time = time.time()
 verification_codes = {}
 
 def get_db():
@@ -20,14 +22,29 @@ def get_db():
     finally:
         db.close()
 
-async def verify_token(x_token: str = Header(None)):
-    if not x_token or not x_token.startswith("fake-token-for-"):
+async def verify_token(x_token: str = Header(None), authorization: str = Header(None)):
+    token = None
+    if authorization and authorization.lower().startswith("bearer "):
+        token = authorization[7:].strip()
+    elif x_token:
+        token = x_token
+
+    if not token or not token.startswith("fake-token-for-"):
         raise HTTPException(status_code=401, detail="Invalid or missing token")
-    return x_token
+    return token
 
 @app.get("/")
 def read_root():
     return {"message": "IA法律顾问后端服务 v1.1 已成功启动！数据库已连接。"}
+
+@app.get("/health")
+def health():
+    return {
+        "ok": True,
+        "service": "ia-backend",
+        "version": "1.1",
+        "uptime_seconds": int(time.time() - start_time)
+    }
 
 @app.post("/send-code")
 def send_verification_code(request: schemas.PhoneRequest):
