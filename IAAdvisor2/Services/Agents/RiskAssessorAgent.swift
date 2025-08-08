@@ -90,7 +90,7 @@ class DefaultRiskAssessorAgent: RiskAssessorAgent {
             message: prompt
         )
         
-        return parseRiskFactorsFromResponse(chatResponse.response, caseDetails: caseDetails)
+        return parseRiskFactorsFromResponse(chatResponse.analysis_report.action_suggestion, caseDetails: caseDetails)
     }
     
     // MARK: - Private Helper Methods
@@ -108,7 +108,8 @@ class DefaultRiskAssessorAgent: RiskAssessorAgent {
         )
         
         // 解析响应
-        let riskFactors = parseRiskFactorsFromResponse(chatResponse.response, caseDetails: request.context?.caseDetails)
+        let riskText = chatResponse.analysis_report.action_suggestion + "\n" + chatResponse.analysis_report.next_steps.process_guidance
+        let riskFactors = parseRiskFactorsFromResponse(riskText, caseDetails: request.context?.caseDetails)
         
         // 计算整体风险等级
         let overallRisk = calculateOverallRisk(riskFactors)
@@ -117,7 +118,7 @@ class DefaultRiskAssessorAgent: RiskAssessorAgent {
         let mitigationStrategies = generateMitigationStrategies(for: riskFactors)
         
         // 计算置信度
-        let confidence = calculateRiskAssessmentConfidence(chatResponse.response, riskFactors: riskFactors)
+        let confidence = calculateRiskAssessmentConfidence(riskText, riskFactors: riskFactors)
         
         return RiskAssessment(
             id: UUID().uuidString,
