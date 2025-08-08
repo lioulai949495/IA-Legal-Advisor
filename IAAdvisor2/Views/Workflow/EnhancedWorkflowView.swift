@@ -1325,8 +1325,19 @@ struct FullAnalysisReportView: View {
                     }
                 }
             }
-            .presentationDetents([.large])
-            .presentationDragIndicator(.visible)
+            .sheetLargeDetentIfAvailable()
+        }
+    }
+}
+
+// MARK: - Compatibility Helpers
+extension View {
+    @ViewBuilder
+    func sheetLargeDetentIfAvailable() -> some View {
+        if #available(iOS 16.0, *) {
+            self.presentationDetents([.large]).presentationDragIndicator(.visible)
+        } else {
+            self
         }
     }
 }
