@@ -42,7 +42,7 @@ class DefaultLegalConsultantAgent: LegalConsultantAgent {
             let chatResponse = try await apiService.sendChatMessage(
                 category: "法律咨询",
                 role: "法律咨询师",
-                subtype: request.caseType?.rawValue,
+                subtype: request.caseType?.rawValue ?? "一般案件",
                 message: prompt
             )
             
