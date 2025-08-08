@@ -724,10 +724,9 @@ extension NewCaseWizard {
                             .multilineTextAlignment(.center)
                     }
                     
-                    Button("生成处理流程") {
-                        isGeneratingWorkflow = true
-                    }
-                    .primaryButtonStyle()
+                    Text("请点击右下角按钮“生成流程”继续")
+                        .font(.caption)
+                        .foregroundColor(.white.opacity(0.7))
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .padding()

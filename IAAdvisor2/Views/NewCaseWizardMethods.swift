@@ -81,6 +81,7 @@ extension NewCaseWizard {
             // 生成案件流程
             if generatedWorkflow.isEmpty {
                 isGeneratingWorkflow = true
+                generateWorkflow()
             } else {
                 withAnimation {
                     currentStep = 6
