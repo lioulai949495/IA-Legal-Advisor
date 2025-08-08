@@ -114,10 +114,10 @@ struct PreTrialPreservationView: View {
             
             // 关键信息
             VStack(spacing: 12) {
-                InfoRow(title: "申请期限", value: "起诉前申请", icon: "clock", color: .blue)
-                InfoRow(title: "执行期限", value: "申请后15日内起诉", icon: "calendar", color: .red)
-                InfoRow(title: "有效期", value: "\(preservationConfig.validityPeriod)天", icon: "timer", color: .green)
-                InfoRow(title: "担保金额", value: "保全标的30%左右", icon: "creditcard", color: .orange)
+                PreservationInfoRow(title: "申请期限", value: "起诉前申请", icon: "clock", color: .blue)
+                PreservationInfoRow(title: "执行期限", value: "申请后15日内起诉", icon: "calendar", color: .red)
+                PreservationInfoRow(title: "有效期", value: "\(preservationConfig.validityPeriod)天", icon: "timer", color: .green)
+                PreservationInfoRow(title: "担保金额", value: "保全标的30%左右", icon: "creditcard", color: .orange)
             }
         }
         .padding()
@@ -283,7 +283,7 @@ struct PreTrialPreservationView: View {
 
 // MARK: - 辅助视图组件
 
-struct InfoRow: View {
+struct PreservationInfoRow: View {
     let title: String
     let value: String
     let icon: String
