@@ -47,7 +47,7 @@ class DefaultLegalConsultantAgent: LegalConsultantAgent {
             )
             
             // 分析回复内容
-            let analysis = analyzeLegalResponse(chatResponse.response)
+            let analysis = analyzeLegalResponse(chatResponse.analysis_report.action_suggestion)
             
             // 生成建议和后续问题
             let recommendations = generateRecommendations(for: request, analysis: analysis)
@@ -59,7 +59,7 @@ class DefaultLegalConsultantAgent: LegalConsultantAgent {
                 id: UUID().uuidString,
                 requestId: request.id,
                 agentId: id,
-                content: formatLegalResponse(chatResponse.response, analysis: analysis),
+                content: formatLegalResponse(chatResponse.analysis_report.action_suggestion, analysis: analysis),
                 confidence: analysis.confidence,
                 recommendations: recommendations,
                 attachments: generateLegalAttachments(for: request.caseType),

@@ -69,8 +69,8 @@ class ChatViewModel: ObservableObject {
             do {
                 let response = try await apiService.sendChatMessage(
                     category: selectedCategory,
-                    role: selectedRole,
-                    subtype: selectedSubtype,
+                    role: selectedRole ?? "默认角色",
+                    subtype: selectedSubtype ?? "默认子类型",
                     message: messageToSend
                 )
                 
@@ -80,8 +80,8 @@ class ChatViewModel: ObservableObject {
                     
                     // 添加AI回复
                     let aiMessage = Message(
-                        id: response.message_id ?? UUID().uuidString,
-                        content: response.response,
+                        id: UUID().uuidString,
+                        content: "📚 适用法条:\n\(response.analysis_report.applicable_laws)\n\n📈 胜诉率：\(response.analysis_report.success_rate_analysis.rate)%\n原因：\(response.analysis_report.success_rate_analysis.reason)\n\n🧭 建议：\n\(response.analysis_report.action_suggestion)\n\n📝 下一步：\n\(response.analysis_report.next_steps.process_guidance)\n\n📄 所需文书：\n\(response.analysis_report.next_steps.document_templates)",
                         createdAt: Date(),
                         isFromAI: true,
                         attachments: nil,
@@ -108,7 +108,7 @@ class ChatViewModel: ObservableObject {
     func startNewChat() {
         Task {
             do {
-                try await apiService.startChat()
+                _ = try await apiService.startChat()
                 await MainActor.run {
                     self.messages.removeAll()
                     self.errorMessage = nil
@@ -125,9 +125,9 @@ class ChatViewModel: ObservableObject {
     func loadRoles() {
         Task {
             do {
-                let roles = try await apiService.getRoles()
+                let rolesResponse = try await apiService.getRoles(category: selectedCategory)
                 await MainActor.run {
-                    self.availableRoles = roles
+                    self.availableRoles = rolesResponse.options
                 }
             } catch {
                 await MainActor.run {
@@ -141,9 +141,9 @@ class ChatViewModel: ObservableObject {
     func loadSubtypes() {
         Task {
             do {
-                let subtypes = try await apiService.getSubtypes()
+                let subtypesResponse = try await apiService.getSubtypes(category: selectedCategory, role: selectedRole ?? "默认角色")
                 await MainActor.run {
-                    self.availableSubtypes = subtypes
+                    self.availableSubtypes = subtypesResponse.options
                 }
             } catch {
                 await MainActor.run {
