@@ -157,7 +157,7 @@ class DefaultLitigationAdvisorAgent: AIAgent {
         let chatResponse = try await apiService.sendChatMessage(
             category: "诉讼分析",
             role: "诉讼分析专家",
-            subtype: request.caseDetails?.caseType.rawValue,
+            subtype: request.caseDetails?.caseType.rawValue ?? "一般案件",
             message: prompt
         )
         
@@ -836,7 +836,7 @@ class DefaultLitigationAdvisorAgent: AIAgent {
         // 简化的策略解析实现
         return LitigationStrategy(
             id: UUID().uuidString,
-            title: "针对\(caseDetails.caseType.rawValue)的诉讼策略",
+            title: "诉讼策略建议",
             phases: extractStrategyPhases(from: response),
             keyArguments: extractKeyArguments(from: response),
             evidenceRequirements: extractEvidenceRequirements(from: response),

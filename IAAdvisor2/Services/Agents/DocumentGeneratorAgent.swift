@@ -133,7 +133,7 @@ class DefaultDocumentGeneratorAgent: DocumentGeneratorAgent {
         
         // 后处理文档内容
         let processedContent = postProcessDocumentContent(
-            chatResponse.response,
+            chatResponse.analysis_report.next_steps.process_guidance,
             type: request.type,
             template: request.template
         )
