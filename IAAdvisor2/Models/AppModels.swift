@@ -94,6 +94,34 @@ struct ChatResponse: Codable {
     }
 }
 
+// 新增：后端 options 响应模型（start-chat / get-roles / get-subtypes）
+struct OptionsResponse: Codable {
+    let response: String
+    let options: [String]
+}
+
+// 新增：AI 分析结构
+struct AnalysisReportResponse: Codable {
+    let analysis_report: AnalysisReport
+}
+
+struct AnalysisReport: Codable {
+    let applicable_laws: String
+    let success_rate_analysis: SuccessRateAnalysis
+    let action_suggestion: String
+    let next_steps: NextSteps
+}
+
+struct SuccessRateAnalysis: Codable {
+    let rate: Int
+    let reason: String
+}
+
+struct NextSteps: Codable {
+    let process_guidance: String
+    let document_templates: String
+}
+
 struct ErrorResponse: Codable {
     let detail: String
 }

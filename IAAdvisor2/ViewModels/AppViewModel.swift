@@ -365,48 +365,47 @@ class AppViewModel: ObservableObject {
         
         Task {
             do {
-                print("开始AI咨询流程...")
+                // 1. 开始聊天会话
+                let categories = try await APIService.shared.startChat()
+                let category = categories.options.first ?? "劳动纠纷"
                 
-                // 开始聊天会话（如果需要）
-                print("正在开始聊天会话...")
-                try await APIService.shared.startChat()
-                print("聊天会话已开始")
+                // 2. 获取角色
+                let roles = try await APIService.shared.getRoles(category: category)
+                let role = roles.options.first ?? "我是员工"
                 
-                // 发送消息到AI
-                print("正在发送消息到AI: \(content)")
-                let response = try await APIService.shared.sendChatMessage(
-                    category: "general", 
+                // 3. 获取子类型
+                let subtypes = try await APIService.shared.getSubtypes(category: category, role: role)
+                let subtype = subtypes.options.first ?? "未签订劳动合同"
+                
+                // 4. 发送消息
+                let analysis = try await APIService.shared.sendChatMessage(
+                    category: category,
+                    role: role,
+                    subtype: subtype,
                     message: content
                 )
-                print("收到AI响应: \(response)")
                 
-                // 处理后端的测试响应，生成更智能的回复
-                let intelligentResponse: String
-                if response.response.contains("Canary test") {
-                    intelligentResponse = generateIntelligentResponse(for: content)
-                } else {
-                    intelligentResponse = response.response
-                }
+                let report = analysis.analysis_report
+                let pretty = """
+                📚 适用法条：\n\(report.applicable_laws)\n\n📈 胜诉率：\(report.success_rate_analysis.rate)%\n原因：\(report.success_rate_analysis.reason)\n\n🧭 建议：\n\(report.action_suggestion)\n\n📝 下一步：\n\(report.next_steps.process_guidance)\n\n📄 所需文书：\n\(report.next_steps.document_templates)
+                """
                 
                 let aiReply = Message(
-                    id: response.message_id ?? UUID().uuidString,
-                    content: intelligentResponse,
+                    id: UUID().uuidString,
+                    content: pretty,
                     createdAt: Date(),
                     isFromAI: true,
                     attachments: nil,
                     documentLinks: nil
                 )
                 
-                // 添加AI回复
                 self.aiChatMessages.append(aiReply)
-                
             } catch let apiError as APIError {
                 // 如果是认证错误，自动登出用户
                 if case .unauthorized = apiError {
                     self.logout()
                     return
                 }
-                
                 let errorMessage = Message(
                     id: UUID().uuidString,
                     content: "抱歉，服务暂时不可用：\(apiError.localizedDescription)",
@@ -417,7 +416,6 @@ class AppViewModel: ObservableObject {
                 )
                 self.aiChatMessages.append(errorMessage)
             } catch {
-                print("AI咨询失败: \(error)")
                 let errorMessage = Message(
                     id: UUID().uuidString,
                     content: "网络连接异常：\(error.localizedDescription)。请检查网络设置后重试。",

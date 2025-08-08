@@ -289,40 +289,29 @@ class APIService {
         return authResponse
     }
     
-    func startChat() async throws {
-        // 提供空的JSON对象作为请求体
+    func startChat() async throws -> OptionsResponse {
         let emptyBody = try JSONEncoder().encode([:] as [String: String])
-        let (_, _) = try await makeRequest(endpoint: "/start-chat", method: "POST", body: emptyBody, requiresAuth: true)
+        let (data, _) = try await makeRequest(endpoint: "/start-chat", method: "POST", body: emptyBody, requiresAuth: true)
+        return try JSONDecoder().decode(OptionsResponse.self, from: data)
     }
     
-    func getRoles() async throws -> [String] {
-        // 提供空的JSON对象作为请求体
-        let emptyBody = try JSONEncoder().encode([:] as [String: String])
-        let (data, _) = try await makeRequest(endpoint: "/get-roles", method: "POST", body: emptyBody, requiresAuth: true)
-        return try JSONDecoder().decode([String].self, from: data)
+    func getRoles(category: String) async throws -> OptionsResponse {
+        let body = try JSONEncoder().encode(["category": category])
+        let (data, _) = try await makeRequest(endpoint: "/get-roles", method: "POST", body: body, requiresAuth: true)
+        return try JSONDecoder().decode(OptionsResponse.self, from: data)
     }
     
-    func getSubtypes() async throws -> [String] {
-        // 提供空的JSON对象作为请求体
-        let emptyBody = try JSONEncoder().encode([:] as [String: String])
-        let (data, _) = try await makeRequest(endpoint: "/get-subtypes", method: "POST", body: emptyBody, requiresAuth: true)
-        return try JSONDecoder().decode([String].self, from: data)
+    func getSubtypes(category: String, role: String) async throws -> OptionsResponse {
+        let body = try JSONEncoder().encode(["category": category, "role": role])
+        let (data, _) = try await makeRequest(endpoint: "/get-subtypes", method: "POST", body: body, requiresAuth: true)
+        return try JSONDecoder().decode(OptionsResponse.self, from: data)
     }
     
-    func sendChatMessage(category: String, message: String, role: String? = nil, subtype: String? = nil) async throws -> ChatResponse {
+    func sendChatMessage(category: String, role: String, subtype: String, message: String) async throws -> AnalysisReportResponse {
         let request = ChatRequest(category: category, role: role, subtype: subtype, message: message)
         let body = try JSONEncoder().encode(request)
         let (data, _) = try await makeRequest(endpoint: "/chat", method: "POST", body: body, requiresAuth: true)
-        
-        do {
-            return try JSONDecoder().decode(ChatResponse.self, from: data)
-        } catch {
-            print("API调试: JSON解码失败 - \(error)")
-            if let responseString = String(data: data, encoding: .utf8) {
-                print("API调试: 原始响应数据: \(responseString)")
-            }
-            throw APIError.decodingError(error)
-        }
+        return try JSONDecoder().decode(AnalysisReportResponse.self, from: data)
     }
     
     // MARK: - 多种登录方式API
