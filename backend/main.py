@@ -2,6 +2,7 @@ from fastapi import FastAPI, Depends, HTTPException, Header
 from sqlalchemy.orm import Session
 import random
 import time
+import uuid
 
 import models
 import schemas
@@ -121,4 +122,56 @@ def get_profile(token: str = Depends(verify_token)):
         "membership_level": "basic",
         "membership_expiry": None,
     }
+
+# --- 最小案件接口 ---
+
+@app.get("/cases", response_model=list[schemas.CaseResponse])
+def list_cases(token: str = Depends(verify_token), db: Session = Depends(get_db)):
+    user_id = token.replace("fake-token-for-", "")
+    rows = db.query(models.Case).filter(models.Case.user_id == user_id).order_by(models.Case.created_at.desc()).all()
+    return [
+        schemas.CaseResponse(
+            id=row.id,
+            title=row.title,
+            description=row.description or "",
+            case_type=row.case_type or "",
+            status=row.status or "active",
+            created_at=row.created_at.isoformat() if row.created_at else "",
+            updated_at=row.updated_at.isoformat() if row.updated_at else "",
+            user_id=row.user_id,
+        ) for row in rows
+    ]
+
+@app.post("/cases", response_model=schemas.CaseResponse)
+def create_case(request: schemas.CreateCaseRequest, token: str = Depends(verify_token), db: Session = Depends(get_db)):
+    user_id = token.replace("fake-token-for-", "")
+    new_id = str(uuid.uuid4())
+    row = models.Case(
+        id=new_id,
+        user_id=user_id,
+        title=request.title,
+        description=request.description,
+        case_type=request.case_type,
+        status="active",
+    )
+    db.add(row)
+    db.commit()
+    db.refresh(row)
+    return schemas.CaseResponse(
+        id=row.id,
+        title=row.title,
+        description=row.description or "",
+        case_type=row.case_type or "",
+        status=row.status or "active",
+        created_at=row.created_at.isoformat() if row.created_at else "",
+        updated_at=row.updated_at.isoformat() if row.updated_at else "",
+        user_id=row.user_id,
+    )
+
+# --- 文档占位接口（仅列表空数组，满足客户端调用） ---
+
+@app.get("/documents", response_model=list[schemas.DocumentResponse])
+def list_documents(case_id: str | None = None, token: str = Depends(verify_token)):
+    # 占位：返回空列表，后续接入存储
+    return []
 
