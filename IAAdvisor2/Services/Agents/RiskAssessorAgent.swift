@@ -85,9 +85,9 @@ class DefaultRiskAssessorAgent: RiskAssessorAgent {
         
         let chatResponse = try await apiService.sendChatMessage(
             category: "风险识别",
-            message: prompt,
             role: "风险分析专家",
-            subtype: caseDetails.caseType.rawValue
+            subtype: caseDetails.caseType.rawValue,
+            message: prompt
         )
         
         return parseRiskFactorsFromResponse(chatResponse.response, caseDetails: caseDetails)
@@ -102,9 +102,9 @@ class DefaultRiskAssessorAgent: RiskAssessorAgent {
         // 调用API进行风险分析
         let chatResponse = try await apiService.sendChatMessage(
             category: "风险评估",
-            message: prompt,
             role: "风险评估专家",
-            subtype: request.caseType?.rawValue
+            subtype: (request.caseType?.rawValue) ?? "一般案件",
+            message: prompt
         )
         
         // 解析响应
