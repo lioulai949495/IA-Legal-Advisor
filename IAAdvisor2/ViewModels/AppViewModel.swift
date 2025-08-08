@@ -75,10 +75,14 @@ class AppViewModel: ObservableObject {
         } else {
             print("AppViewModel: 未找到有效token或未完成登录流程，设置为未认证状态")
             appState = .unauthenticated
-            // 清除无效token
-            if UserDefaults.standard.string(forKey: "auth_token") != nil && !hasCompletedLogin {
-                UserDefaults.standard.removeObject(forKey: "auth_token")
-                APIService.shared.logout()
+            // 清除无效或旧格式token与标记
+            if let token = UserDefaults.standard.string(forKey: "auth_token") {
+                if !hasCompletedLogin || !token.hasPrefix("fake-token-for-") {
+                    UserDefaults.standard.removeObject(forKey: "auth_token")
+                    UserDefaults.standard.removeObject(forKey: "has_completed_login")
+                    APIService.shared.logout()
+                    print("AppViewModel: 已清除无效token与登录标记")
+                }
             }
         }
     }
