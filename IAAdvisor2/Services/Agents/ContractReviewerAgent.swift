@@ -121,6 +121,30 @@ class DefaultContractReviewerAgent: AIAgent {
     
     // MARK: - Private Helper Methods
     
+    private func parseOptimizationAdvice(_ response: String) -> [ClauseImprovement] {
+        // 依据换行或编号拆分建议
+        let lines = response
+            .replacingOccurrences(of: "\r", with: "")
+            .components(separatedBy: CharacterSet.newlines)
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
+        
+        var improvements: [ClauseImprovement] = []
+        for (idx, line) in lines.enumerated() {
+            let title = line.prefix(40).trimmingCharacters(in: .whitespacesAndNewlines)
+            let detail = line
+            improvements.append(ClauseImprovement(
+                id: UUID().uuidString,
+                clauseIndex: idx,
+                issue: String(title),
+                suggestion: detail,
+                riskLevel: .medium,
+                priority: .normal
+            ))
+        }
+        return improvements
+    }
+    
     private func parseContractReviewRequest(_ request: AgentRequest) -> ContractReviewRequest {
         // 从请求中提取合同内容和类型
         let contractContent = request.content
