@@ -808,18 +808,11 @@ extension NewCaseWizard {
                 .padding()
                 .liquidGlass()
                 
-                // 创建案件按钮
-                VStack(spacing: 16) {
-                    Button("创建案件并开始执行") {
-                        createCaseAndStart()
-                    }
-                    .primaryButtonStyle()
-                    
-                    Text("创建后，您可以随时查看进度、与AI咨询、管理文档")
-                        .font(.caption)
-                        .foregroundColor(.white.opacity(0.6))
-                        .multilineTextAlignment(.center)
-                }
+                // 提示使用右下角主按钮
+                Text("请点击右下角“创建案件”开始执行流程")
+                    .font(.caption)
+                    .foregroundColor(.white.opacity(0.6))
+                    .multilineTextAlignment(.center)
                 
                 Spacer(minLength: 100)
             }
