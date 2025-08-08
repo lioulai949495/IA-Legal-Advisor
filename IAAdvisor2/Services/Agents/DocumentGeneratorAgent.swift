@@ -126,9 +126,9 @@ class DefaultDocumentGeneratorAgent: DocumentGeneratorAgent {
         // 调用API生成文档内容
         let chatResponse = try await apiService.sendChatMessage(
             category: "文档生成",
-            message: prompt,
             role: "法律文书专家",
-            subtype: request.type.rawValue
+            subtype: request.type.rawValue,
+            message: prompt
         )
         
         // 后处理文档内容
