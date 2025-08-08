@@ -29,7 +29,7 @@ extension NewCaseWizard {
             } else {
                 return currentQuestionIndex >= iaQuestions.count || !questionAnswers.isEmpty
             }
-        case 3: return !caseDescription.isEmpty
+        case 3: return true
         // 步骤5（专业分析）：允许点击“开始专业分析”以启动分析
         case 4: return true
         case 5: return !generatedWorkflow.isEmpty

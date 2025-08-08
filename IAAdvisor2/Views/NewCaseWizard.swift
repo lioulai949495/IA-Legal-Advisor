@@ -94,6 +94,10 @@ struct NewCaseWizard: View {
             DocumentPicker { documents in
                 uploadedDocuments.append(contentsOf: documents)
                 generateDescriptionFromDocuments()
+                // 选择完成后，直接跳到下一步（专业分析）
+                withAnimation {
+                    currentStep = 4
+                }
             }
         }
         .sheet(isPresented: $showingCaseTypeSelector) {
