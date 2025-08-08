@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="21513" systemVersion="22G120" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="CDCase" representedClassName="CDCase" syncable="YES">
+        <attribute name="caseDescription" optional="YES" attributeType="String"/>
+        <attribute name="caseType" optional="YES" attributeType="String"/>
+        <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="id" optional="YES" attributeType="String"/>
+        <attribute name="status" optional="YES" attributeType="String"/>
+        <attribute name="title" optional="YES" attributeType="String"/>
+        <attribute name="updatedAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="userId" optional="YES" attributeType="String"/>
+        <relationship name="aiAnalyses" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="CDAIAnalysis" inverseName="case" inverseEntity="CDAIAnalysis"/>
+        <relationship name="documents" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="CDDocument" inverseName="case" inverseEntity="CDDocument"/>
+        <relationship name="messages" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="CDMessage" inverseName="case" inverseEntity="CDMessage"/>
+    </entity>
+    <entity name="CDAIAnalysis" representedClassName="CDAIAnalysis" syncable="YES">
+        <attribute name="analysisType" optional="YES" attributeType="String"/>
+        <attribute name="caseId" optional="YES" attributeType="String"/>
+        <attribute name="confidence" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="id" optional="YES" attributeType="String"/>
+        <attribute name="recommendations" optional="YES" attributeType="String"/>
+        <attribute name="result" optional="YES" attributeType="String"/>
+        <relationship name="case" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CDCase" inverseName="aiAnalyses" inverseEntity="CDCase"/>
+    </entity>
+    <entity name="CDCacheEntry" representedClassName="CDCacheEntry" syncable="YES">
+        <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="data" optional="YES" attributeType="Binary"/>
+        <attribute name="expirationDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="key" optional="YES" attributeType="String"/>
+    </entity>
+    <entity name="CDDocument" representedClassName="CDDocument" syncable="YES">
+        <attribute name="caseId" optional="YES" attributeType="String"/>
+        <attribute name="filename" optional="YES" attributeType="String"/>
+        <attribute name="fileSize" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="fileType" optional="YES" attributeType="String"/>
+        <attribute name="fileUrl" optional="YES" attributeType="String"/>
+        <attribute name="id" optional="YES" attributeType="String"/>
+        <attribute name="uploadedAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="case" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CDCase" inverseName="documents" inverseEntity="CDCase"/>
+    </entity>
+    <entity name="CDMessage" representedClassName="CDMessage" syncable="YES">
+        <attribute name="caseId" optional="YES" attributeType="String"/>
+        <attribute name="content" optional="YES" attributeType="String"/>
+        <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="id" optional="YES" attributeType="String"/>
+        <attribute name="isFromAI" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <relationship name="case" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CDCase" inverseName="messages" inverseEntity="CDCase"/>
+    </entity>
+    <entity name="CDSyncStatus" representedClassName="CDSyncStatus" syncable="YES">
+        <attribute name="entityName" optional="YES" attributeType="String"/>
+        <attribute name="isFullSyncNeeded" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="lastSyncDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="syncVersion" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+    </entity>
+</model>

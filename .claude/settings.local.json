@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(xcodebuild:*)",
+      "Bash(mkdir:*)",
+      "Bash(find:*)",
+      "Bash(curl:*)",
+      "Bash(ls:*)",
+      "Bash(swiftc:*)",
+      "Bash(for:*)",
+      "Bash(do echo \"Checking $file:\")",
+      "Bash(echo:*)",
+      "Bash(done)",
+      "Bash(mv:*)",
+      "Bash(rm:*)",
+      "Bash(swift:*)",
+      "Bash(grep:*)",
+      "WebFetch(domain:ia-legal-advisor.onrender.com)",
+      "mcp__ide__getDiagnostics",
+      "Bash(python3:*)",
+      "Bash(chmod:*)",
+      "Bash(./validate_build.sh)",
+      "Bash(xmllint:*)",
+      "Bash(-exec swift -frontend -parse {})",
+      "Bash(touch:*)"
+    ],
+    "deny": []
+  }
+}
