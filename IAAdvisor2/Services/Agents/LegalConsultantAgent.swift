@@ -99,7 +99,19 @@ class DefaultLegalConsultantAgent: LegalConsultantAgent {
             subtype: caseType.rawValue,
             message: prompt
         )
-        return parseConsultationResponse(chatResponse.analysis_report.action_suggestion)
+        let report = chatResponse.analysis_report
+        let advice = LegalAdvice(
+            id: UUID().uuidString,
+            advice: report.action_suggestion,
+            legalBasis: report.applicable_laws,
+            applicableLaws: report.applicable_laws
+                .split(separator: "\n").map { String($0) }.filter { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty },
+            nextSteps: report.next_steps.process_guidance
+                .split(separator: "\n").map { String($0) }.filter { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty },
+            confidence: min(max(Double(report.success_rate_analysis.rate) / 100.0, 0.0), 1.0),
+            disclaimers: ["本建议仅供参考，具体以专业律师意见为准"]
+        )
+        return advice
     }
     
     func answerLegalQuestion(_ question: String, context: AgentContext?) async throws -> String {
