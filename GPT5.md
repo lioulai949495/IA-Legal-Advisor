@@ -33,4 +33,14 @@
 - TestFlight 构建与元数据
 
 ## 变更记录
-- 2025-08-08：修复 iOS 多处编译错误，统一 `AnalysisReportResponse`；登录逻辑收紧；后端允许 000000 测试码 
+- 2025-08-08：修复 iOS 多处编译错误，统一 `AnalysisReportResponse`；登录逻辑收紧；后端允许 000000 测试码
+- 2025-08-08（续）：
+  - 新增后端 `/profile`（与 iOS `getUserProfile()` 契约一致）
+  - 编写并指导完成 Postman 环境/集合/变量/鉴权与四个请求的详细测试流程（健康检查/登录/资料/引导式对话）
+  - 实现最小版 `/cases`（GET 列表、POST 创建），新增 ORM `Case` 与 Pydantic `CaseResponse/CreateCaseRequest/UpdateCaseRequest`
+  - 新增占位 `/documents`（GET 列表返回空数组，后续接入上传）
+  - iOS `CaseViewModel` 接入后端 `/cases` 完成“列表+创建”闭环（不改 UI 结构）
+  - Render 手动部署并通过 Postman 验证 `/cases` 成功
+
+## 操作偏好（记忆）
+- 任何需要你操作的环节，提供“极其详细的中文分步指引”（界面点击、填写内容、预期结果、失败排查）。 
