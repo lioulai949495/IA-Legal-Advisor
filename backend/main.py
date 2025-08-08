@@ -91,6 +91,19 @@ def get_subtypes(request: schemas.ChatRequest, token: str = Depends(verify_token
 
 @app.post("/chat")
 def chat_with_ai(request: schemas.ChatRequest, token: str = Depends(verify_token)):
-    # Canary Test: Return a hardcoded message to verify deployment.
-    return {"message": "Canary test successful: chat endpoint is live!"}
+    try:
+        if not all([request.category, request.role, request.subtype, request.message]):
+            raise HTTPException(status_code=400, detail="category, role, subtype, message are required")
+        result = ai_services.get_ai_response(
+            category=request.category,
+            role=request.role,
+            subtype=request.subtype,
+            message=request.message,
+        )
+        return result
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"/chat error: {e}")
+        raise HTTPException(status_code=500, detail="AI service error")
 
