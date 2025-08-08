@@ -55,7 +55,7 @@ class AppViewModel: ObservableObject {
         if hasCompletedLogin,
            let token = UserDefaults.standard.string(forKey: "auth_token"),
            !token.isEmpty,
-           token.hasPrefix("fake-token-") { // 只接受有效格式的token
+           token.hasPrefix("fake-token-for-") { // 只接受有效格式的token
             print("AppViewModel: 找到有效格式的token，设置为已认证状态")
             
             // 创建用户对象
