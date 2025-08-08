@@ -60,7 +60,8 @@ def login(request: schemas.LoginRequest, db: Session = Depends(get_db)):
     # ... (此部分代码不变)
     phone_number = request.phone_number
     code = request.code
-    if verification_codes.get(phone_number) != code:
+    # 开发期通用测试验证码 000000，同时保留原有校验
+    if verification_codes.get(phone_number) != code and code != "000000":
         raise HTTPException(status_code=400, detail="验证码错误")
     if phone_number in verification_codes:
         del verification_codes[phone_number]
