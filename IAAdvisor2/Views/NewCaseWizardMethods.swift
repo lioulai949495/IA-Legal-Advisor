@@ -30,7 +30,8 @@ extension NewCaseWizard {
                 return currentQuestionIndex >= iaQuestions.count || !questionAnswers.isEmpty
             }
         case 3: return !caseDescription.isEmpty
-        case 4: return agentAnalysisResult != nil
+        // 步骤5（专业分析）：允许点击“开始专业分析”以启动分析
+        case 4: return true
         case 5: return !generatedWorkflow.isEmpty
         case 6: return true
         default: return true
@@ -202,6 +203,10 @@ extension NewCaseWizard {
         DispatchQueue.main.async {
             self.agentAnalysisResult = analysis
             self.isAnalyzing = false
+            // 分析完成后自动进入下一步（流程生成）
+            withAnimation {
+                self.currentStep = 5
+            }
         }
     }
     
