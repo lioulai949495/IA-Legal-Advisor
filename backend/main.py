@@ -108,3 +108,17 @@ def chat_with_ai(request: schemas.ChatRequest, token: str = Depends(verify_token
         print(f"/chat error: {e}")
         raise HTTPException(status_code=500, detail="AI service error")
 
+@app.get("/profile", response_model=schemas.UserProfileResponse)
+def get_profile(token: str = Depends(verify_token)):
+    # token: fake-token-for-<phone>
+    phone = token.replace("fake-token-for-", "")
+    return {
+        "id": phone,
+        "username": "用户" + phone[-4:],
+        "email": f"{phone}@temp.com",
+        "phone_number": phone,
+        "created_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+        "membership_level": "basic",
+        "membership_expiry": None,
+    }
+
