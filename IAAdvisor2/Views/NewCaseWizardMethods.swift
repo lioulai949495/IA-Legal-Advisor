@@ -204,9 +204,10 @@ extension NewCaseWizard {
         DispatchQueue.main.async {
             self.agentAnalysisResult = analysis
             self.isAnalyzing = false
-            // 分析完成后自动进入下一步（流程生成）
+            // 分析完成后直接生成流程并跳过“生成流程”步骤，进入“开始执行”
+            self.createWorkflowSteps()
             withAnimation {
-                self.currentStep = 5
+                self.currentStep = 6
             }
         }
     }

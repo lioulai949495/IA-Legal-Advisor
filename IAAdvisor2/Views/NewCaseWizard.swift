@@ -23,7 +23,7 @@ struct NewCaseWizard: View {
     @State var isAnalyzing = false
     @State var isGeneratingWorkflow = false
     
-    private let totalSteps = 7
+    private let totalSteps = 6
     
     var body: some View {
         VStack(spacing: 0) {
@@ -54,13 +54,9 @@ struct NewCaseWizard: View {
                 agentAnalysisStep
                     .tag(4)
                 
-                // 步骤6：生成案件流程
-                workflowGenerationStep
-                    .tag(5)
-                
-                // 步骤7：开始执行流程
+                // 步骤6：开始执行流程（跳过原“生成流程”）
                 startExecutionStep
-                    .tag(6)
+                    .tag(5)
             }
             .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
             .allowsHitTesting(true)
