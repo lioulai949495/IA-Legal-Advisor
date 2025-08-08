@@ -102,12 +102,12 @@ class DefaultLitigationAdvisorAgent: AIAgent {
         
         let chatResponse = try await apiService.sendChatMessage(
             category: "诉讼策略",
-            message: prompt,
             role: "诉讼策略专家",
-            subtype: caseDetails.caseType.rawValue
+            subtype: caseDetails.caseType.rawValue,
+            message: prompt
         )
         
-        return parseLitigationStrategy(chatResponse.response, caseDetails: caseDetails)
+        return parseLitigationStrategy(chatResponse.analysis_report.next_steps.process_guidance)
     }
     
     fileprivate func planEvidenceStrategy(_ caseDetails: CaseDetails) async throws -> EvidenceStrategy {
@@ -115,11 +115,12 @@ class DefaultLitigationAdvisorAgent: AIAgent {
         
         let chatResponse = try await apiService.sendChatMessage(
             category: "证据策略",
-            message: prompt,
-            role: "证据专家"
+            role: "证据专家",
+            subtype: caseDetails.caseType.rawValue,
+            message: prompt
         )
         
-        return parseEvidenceStrategy(chatResponse.response)
+        return parseEvidenceStrategy(chatResponse.analysis_report.next_steps.process_guidance)
     }
     
     fileprivate func assessTrialReadiness(_ caseDetails: CaseDetails) async throws -> TrialReadinessAssessment {
@@ -127,11 +128,12 @@ class DefaultLitigationAdvisorAgent: AIAgent {
         
         let chatResponse = try await apiService.sendChatMessage(
             category: "庭审准备",
-            message: prompt,
-            role: "庭审专家"
+            role: "庭审专家",
+            subtype: caseDetails.caseType.rawValue,
+            message: prompt
         )
         
-        return parseTrialReadiness(chatResponse.response)
+        return parseTrialReadiness(chatResponse.analysis_report.next_steps.process_guidance)
     }
     
     // MARK: - Private Helper Methods
@@ -154,19 +156,19 @@ class DefaultLitigationAdvisorAgent: AIAgent {
         // 调用API进行分析
         let chatResponse = try await apiService.sendChatMessage(
             category: "诉讼分析",
-            message: prompt,
             role: "诉讼分析专家",
-            subtype: request.caseDetails?.caseType.rawValue
+            subtype: request.caseDetails?.caseType.rawValue,
+            message: prompt
         )
         
         // 解析分析结果
-        let winningProbability = extractWinningProbability(from: chatResponse.response)
-        let estimatedDuration = extractEstimatedDuration(from: chatResponse.response)
-        let estimatedCosts = extractEstimatedCosts(from: chatResponse.response)
-        let identifiedRisks = extractLitigationRisks(from: chatResponse.response)
-        let strategicOptions = extractStrategicOptions(from: chatResponse.response)
-        let overallRecommendation = extractOverallRecommendation(from: chatResponse.response)
-        let confidence = calculateLitigationConfidence(chatResponse.response)
+        let winningProbability = extractWinningProbability(from: chatResponse.analysis_report.next_steps.process_guidance)
+        let estimatedDuration = extractEstimatedDuration(from: chatResponse.analysis_report.next_steps.process_guidance)
+        let estimatedCosts = extractEstimatedCosts(from: chatResponse.analysis_report.next_steps.process_guidance)
+        let identifiedRisks = extractLitigationRisks(from: chatResponse.analysis_report.next_steps.process_guidance)
+        let strategicOptions = extractStrategicOptions(from: chatResponse.analysis_report.next_steps.process_guidance)
+        let overallRecommendation = extractOverallRecommendation(from: chatResponse.analysis_report.next_steps.process_guidance)
+        let confidence = calculateLitigationConfidence(chatResponse.analysis_report.next_steps.process_guidance)
         
         // 获取程序指导
         let proceduralGuidance = generateProceduralGuidance(request.caseDetails?.caseType)
@@ -830,7 +832,7 @@ class DefaultLitigationAdvisorAgent: AIAgent {
     
     // MARK: - Parsing and Extraction Methods
     
-    private func parseLitigationStrategy(_ response: String, caseDetails: CaseDetails) -> LitigationStrategy {
+    private func parseLitigationStrategy(_ response: String) -> LitigationStrategy {
         // 简化的策略解析实现
         return LitigationStrategy(
             id: UUID().uuidString,

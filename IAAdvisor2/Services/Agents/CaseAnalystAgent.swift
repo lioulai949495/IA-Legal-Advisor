@@ -39,13 +39,14 @@ class DefaultCaseAnalystAgent: CaseAnalystAgent {
             // 调用API进行分析
             let chatResponse = try await apiService.sendChatMessage(
                 category: "案件分析",
-                message: prompt,
-                role: "案件分析专家",
-                subtype: request.caseType?.rawValue
+                role: "案件分析师",
+                subtype: request.caseType?.rawValue ?? "一般案件",
+                message: prompt
             )
+            let responseText = chatResponse.analysis_report.action_suggestion
             
             // 分析回复并提取结构化信息
-            let analysisResult = parseAnalysisResponse(chatResponse.response)
+            let analysisResult = parseAnalysisResponse(responseText)
             
             // 生成专业建议
             let recommendations = generateAnalysisRecommendations(
@@ -88,12 +89,12 @@ class DefaultCaseAnalystAgent: CaseAnalystAgent {
         
         let chatResponse = try await apiService.sendChatMessage(
             category: "案件分析",
-            message: prompt,
             role: "法律分析专家",
-            subtype: caseDetails.caseType.rawValue
+            subtype: caseDetails.caseType.rawValue,
+            message: prompt
         )
         
-        return parseCaseStrengthResponse(chatResponse.response, caseDetails: caseDetails)
+        return parseCaseStrengthResponse(chatResponse.analysis_report.action_suggestion, caseDetails: caseDetails)
     }
     
     func identifyLegalIssues(_ caseDetails: CaseDetails) async throws -> [LegalIssue] {
@@ -101,12 +102,12 @@ class DefaultCaseAnalystAgent: CaseAnalystAgent {
         
         let chatResponse = try await apiService.sendChatMessage(
             category: "法律问题识别",
-            message: prompt,
             role: "法律问题专家",
-            subtype: caseDetails.caseType.rawValue
+            subtype: caseDetails.caseType.rawValue,
+            message: prompt
         )
         
-        return parseLegalIssuesResponse(chatResponse.response)
+        return parseLegalIssuesResponse(chatResponse.analysis_report.action_suggestion)
     }
     
     func suggestLegalStrategy(_ caseDetails: CaseDetails) async throws -> LegalStrategy {
@@ -114,12 +115,12 @@ class DefaultCaseAnalystAgent: CaseAnalystAgent {
         
         let chatResponse = try await apiService.sendChatMessage(
             category: "法律策略",
-            message: prompt,
             role: "法律策略专家",
-            subtype: caseDetails.caseType.rawValue
+            subtype: caseDetails.caseType.rawValue,
+            message: prompt
         )
         
-        return parseStrategyResponse(chatResponse.response, caseDetails: caseDetails)
+        return parseStrategyResponse(chatResponse.analysis_report.action_suggestion, caseDetails: caseDetails)
     }
     
     // MARK: - Private Helper Methods

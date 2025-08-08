@@ -69,9 +69,9 @@ class ChatViewModel: ObservableObject {
             do {
                 let response = try await apiService.sendChatMessage(
                     category: selectedCategory,
-                    message: messageToSend,
                     role: selectedRole,
-                    subtype: selectedSubtype
+                    subtype: selectedSubtype,
+                    message: messageToSend
                 )
                 
                 await MainActor.run {

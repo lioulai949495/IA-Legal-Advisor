@@ -41,9 +41,9 @@ class DefaultLegalConsultantAgent: LegalConsultantAgent {
             // 调用API获取AI回复
             let chatResponse = try await apiService.sendChatMessage(
                 category: "法律咨询",
-                message: prompt,
-                role: "法律顾问",
-                subtype: request.caseType?.rawValue
+                role: "法律咨询师",
+                subtype: request.caseType?.rawValue,
+                message: prompt
             )
             
             // 分析回复内容
@@ -95,20 +95,11 @@ class DefaultLegalConsultantAgent: LegalConsultantAgent {
         
         let chatResponse = try await apiService.sendChatMessage(
             category: "法律咨询",
-            message: prompt,
-            role: "专业律师",
-            subtype: caseType.rawValue
+            role: "法律咨询师",
+            subtype: caseType.rawValue,
+            message: prompt
         )
-        
-        return LegalAdvice(
-            id: UUID().uuidString,
-            advice: chatResponse.response,
-            legalBasis: extractLegalBasis(from: chatResponse.response),
-            applicableLaws: extractApplicableLaws(from: chatResponse.response),
-            nextSteps: extractNextSteps(from: chatResponse.response),
-            confidence: calculateConfidence(chatResponse.response),
-            disclaimers: getStandardDisclaimers()
-        )
+        return parseConsultationResponse(chatResponse.analysis_report.action_suggestion)
     }
     
     func answerLegalQuestion(_ question: String, context: AgentContext?) async throws -> String {
@@ -131,11 +122,11 @@ class DefaultLegalConsultantAgent: LegalConsultantAgent {
         
         let chatResponse = try await apiService.sendChatMessage(
             category: "法律咨询",
-            message: prompt,
-            role: "法律专家"
+            role: "法律咨询师",
+            subtype: caseDetails.caseType.rawValue,
+            message: detailedPrompt
         )
-        
-        return chatResponse.response
+        return parseDetailedAdviceResponse(chatResponse.analysis_report.action_suggestion)
     }
     
     // MARK: - Private Helper Methods

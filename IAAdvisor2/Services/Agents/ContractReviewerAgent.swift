@@ -98,23 +98,25 @@ class DefaultContractReviewerAgent: AIAgent {
         
         let chatResponse = try await apiService.sendChatMessage(
             category: "合同风险识别",
-            message: prompt,
-            role: "合同风险专家"
+            role: "合同风险专家",
+            subtype: "contract-reviewer",
+            message: prompt
         )
         
-        return parseRiskyClausesFromResponse(chatResponse.response)
+        return parseRiskyClausesFromResponse(chatResponse.analysis_report.action_suggestion)
     }
     
     fileprivate func suggestClauseImprovements(_ contractContent: String, focusArea: ContractFocusArea) async throws -> [ClauseImprovement] {
         let prompt = buildImprovementPrompt(contractContent, focusArea: focusArea)
         
         let chatResponse = try await apiService.sendChatMessage(
-            category: "合同改进建议",
-            message: prompt,
-            role: "合同优化专家"
+            category: "条款优化",
+            role: "合同审查师",
+            subtype: "contract-reviewer",
+            message: prompt
         )
         
-        return parseImprovementsFromResponse(chatResponse.response)
+        return parseOptimizationAdvice(chatResponse.analysis_report.action_suggestion)
     }
     
     // MARK: - Private Helper Methods
@@ -141,13 +143,13 @@ class DefaultContractReviewerAgent: AIAgent {
         // 调用API进行合同审查
         let chatResponse = try await apiService.sendChatMessage(
             category: "合同审查",
-            message: prompt,
-            role: "合同审查专家",
-            subtype: request.type.rawValue
+            role: "合同审查师",
+            subtype: request.type.rawValue,
+            message: prompt
         )
         
         // 解析审查结果
-        let analysisResult = parseContractAnalysis(chatResponse.response)
+        let analysisResult = parseContractAnalysis(chatResponse.analysis_report.action_suggestion)
         
         // 识别风险条款
         let riskyClause = try await identifyRiskyClauses(request.content)
