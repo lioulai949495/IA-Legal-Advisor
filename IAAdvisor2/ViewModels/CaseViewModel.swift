@@ -34,11 +34,33 @@ class CaseViewModel: ObservableObject {
     /// 加载用户案件列表
     func loadCases() {
         isLoading = true
+        errorMessage = nil
         
-        // 模拟网络请求
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
-            self?.isLoading = false
-            self?.loadSampleCases()
+        Task {
+            do {
+                let serverCases = try await apiService.getCases()
+                await MainActor.run {
+                    self.isLoading = false
+                    // 将服务端数据转换为前端 Case 模型（最小映射）
+                    self.cases = serverCases.map { resp in
+                        Case(
+                            id: resp.id,
+                            title: resp.title,
+                            description: resp.description,
+                            createdAt: ISO8601DateFormatter().date(from: resp.created_at) ?? Date(),
+                            lastUpdatedAt: ISO8601DateFormatter().date(from: resp.updated_at) ?? Date(),
+                            caseType: CaseType(rawValue: resp.case_type) ?? .contractDispute,
+                            status: CaseStatus(rawValue: resp.status) ?? .active,
+                            messages: []
+                        )
+                    }
+                }
+            } catch {
+                await MainActor.run {
+                    self.isLoading = false
+                    self.errorMessage = "获取案件失败：\(error.localizedDescription)"
+                }
+            }
         }
     }
     
@@ -49,27 +71,37 @@ class CaseViewModel: ObservableObject {
             return
         }
         
-        // 案件类型总是有值，因为使用了默认值
-        
         isLoading = true
+        errorMessage = nil
+        let title = newCaseTitle
+        let desc = newCaseDescription
+        let type = selectedCaseType.rawValue
         
-        let newCase = Case(
-            id: UUID().uuidString,
-            title: newCaseTitle,
-            description: newCaseDescription,
-            createdAt: Date(),
-            lastUpdatedAt: Date(),
-            caseType: selectedCaseType,
-            status: CaseStatus.active,
-            messages: []
-        )
-        
-        // 模拟网络请求
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
-            self?.isLoading = false
-            self?.cases.insert(newCase, at: 0)
-            self?.clearNewCaseForm()
-            self?.isShowingNewCaseWizard = false
+        Task {
+            do {
+                let created = try await apiService.createCase(title: title, description: desc, caseType: type)
+                await MainActor.run {
+                    self.isLoading = false
+                    let newItem = Case(
+                        id: created.id,
+                        title: created.title,
+                        description: created.description,
+                        createdAt: ISO8601DateFormatter().date(from: created.created_at) ?? Date(),
+                        lastUpdatedAt: ISO8601DateFormatter().date(from: created.updated_at) ?? Date(),
+                        caseType: CaseType(rawValue: created.case_type) ?? .contractDispute,
+                        status: CaseStatus(rawValue: created.status) ?? .active,
+                        messages: []
+                    )
+                    self.cases.insert(newItem, at: 0)
+                    self.clearNewCaseForm()
+                    self.isShowingNewCaseWizard = false
+                }
+            } catch {
+                await MainActor.run {
+                    self.isLoading = false
+                    self.errorMessage = "创建案件失败：\(error.localizedDescription)"
+                }
+            }
         }
     }
     
@@ -128,37 +160,7 @@ class CaseViewModel: ObservableObject {
     
     /// 加载示例案件数据
     private func loadSampleCases() {
-        cases = [
-            Case(
-                id: "1",
-                title: "劳动合同纠纷",
-                description: "公司未支付加班费，需要法律咨询",
-                createdAt: Date().addingTimeInterval(-AppConstants.Time.oneDay * 2),
-                lastUpdatedAt: Date().addingTimeInterval(-AppConstants.Time.oneDay),
-                caseType: .laborDispute,
-                status: .active,
-                messages: []
-            ),
-            Case(
-                id: "2",
-                title: "房屋租赁纠纷",
-                description: "房东提前解除合同，要求赔偿",
-                createdAt: Date().addingTimeInterval(-AppConstants.Time.oneDay * 3),
-                lastUpdatedAt: Date().addingTimeInterval(-AppConstants.Time.oneDay * 2),
-                caseType: .propertyDispute,
-                status: .active,
-                messages: []
-            ),
-            Case(
-                id: "3",
-                title: "交通事故理赔",
-                description: "交通事故责任认定和保险理赔问题",
-                createdAt: Date().addingTimeInterval(-AppConstants.Time.oneWeek),
-                lastUpdatedAt: Date().addingTimeInterval(-AppConstants.Time.oneDay * 3),
-                caseType: .propertyDispute,
-                status: .completed,
-                messages: []
-            )
-        ]
+        // 启动时尝试从后端拉取；失败则保持空列表
+        loadCases()
     }
 }
