@@ -123,14 +123,22 @@ class DefaultLegalConsultantAgent: LegalConsultantAgent {
         let chatResponse = try await apiService.sendChatMessage(
             category: "法律咨询",
             role: "法律咨询师",
-            subtype: caseDetails.caseType.rawValue,
-            message: detailedPrompt
+            subtype: context?.caseDetails?.caseType.rawValue ?? "一般案件",
+            message: prompt
         )
         return parseDetailedAdviceResponse(chatResponse.analysis_report.action_suggestion)
     }
     
     // MARK: - Private Helper Methods
     
+    private func parseConsultationResponse(_ response: String) -> String {
+        return response
+    }
+
+    private func parseDetailedAdviceResponse(_ response: String) -> String {
+        return response
+    }
+
     private func buildLegalConsultationPrompt(_ request: AgentRequest) -> String {
         var prompt = """
         您好，我是您的专业法律顾问。针对您的问题，我将为您提供专业的法律分析和建议。
