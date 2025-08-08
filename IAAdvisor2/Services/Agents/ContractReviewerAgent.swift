@@ -122,25 +122,30 @@ class DefaultContractReviewerAgent: AIAgent {
     // MARK: - Private Helper Methods
     
     private func parseOptimizationAdvice(_ response: String) -> [ClauseImprovement] {
-        // 依据换行或编号拆分建议
-        let lines = response
+        let paragraphs = response
             .replacingOccurrences(of: "\r", with: "")
-            .components(separatedBy: CharacterSet.newlines)
+            .components(separatedBy: "\n\n")
             .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
             .filter { !$0.isEmpty }
-        
+
         var improvements: [ClauseImprovement] = []
-        for (idx, line) in lines.enumerated() {
-            let title = line.prefix(40).trimmingCharacters(in: .whitespacesAndNewlines)
-            let detail = line
-            improvements.append(ClauseImprovement(
+        for para in paragraphs {
+            let lines = para.components(separatedBy: .newlines)
+            let current = lines.first ?? para
+            let suggestion = lines.dropFirst().joined(separator: "\n")
+            let issues = ["条款可读性与风险提示不足"]
+            let rationale = "基于AI分析建议优化当前条款表述，增强明确性与可执行性"
+            let expectedBenefit = "降低争议风险，提升条款清晰度"
+            let item = ClauseImprovement(
                 id: UUID().uuidString,
-                clauseIndex: idx,
-                issue: String(title),
-                suggestion: detail,
-                riskLevel: .medium,
-                priority: .normal
-            ))
+                currentClause: current,
+                issues: issues,
+                suggestedClause: suggestion.isEmpty ? current : suggestion,
+                rationale: rationale,
+                priority: .medium,
+                expectedBenefit: expectedBenefit
+            )
+            improvements.append(item)
         }
         return improvements
     }
