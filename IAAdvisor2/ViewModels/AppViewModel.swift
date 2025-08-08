@@ -51,7 +51,9 @@ class AppViewModel: ObservableObject {
     
     /// 检查认证状态
     private func checkAuthenticationStatus() {
-        if let token = UserDefaults.standard.string(forKey: "auth_token"),
+        let hasCompletedLogin = UserDefaults.standard.bool(forKey: "has_completed_login")
+        if hasCompletedLogin,
+           let token = UserDefaults.standard.string(forKey: "auth_token"),
            !token.isEmpty,
            token.hasPrefix("fake-token-") { // 只接受有效格式的token
             print("AppViewModel: 找到有效格式的token，设置为已认证状态")
@@ -71,10 +73,10 @@ class AppViewModel: ObservableObject {
             )
             self.errorMessage = nil
         } else {
-            print("AppViewModel: 未找到有效token，设置为未认证状态")
+            print("AppViewModel: 未找到有效token或未完成登录流程，设置为未认证状态")
             appState = .unauthenticated
             // 清除无效token
-            if UserDefaults.standard.string(forKey: "auth_token") != nil {
+            if UserDefaults.standard.string(forKey: "auth_token") != nil && !hasCompletedLogin {
                 UserDefaults.standard.removeObject(forKey: "auth_token")
                 APIService.shared.logout()
             }
@@ -162,6 +164,7 @@ class AppViewModel: ObservableObject {
                     
                     // 设置认证状态
                     self.appState = .authenticated
+                    UserDefaults.standard.set(true, forKey: "has_completed_login")
                     print("登录流程完成，设置为已认证状态")
                 }
                 
@@ -202,6 +205,7 @@ class AppViewModel: ObservableObject {
         
         // 清除存储的 token
         UserDefaults.standard.removeObject(forKey: "auth_token")
+        UserDefaults.standard.removeObject(forKey: "has_completed_login")
         APIService.shared.logout()
         print("logout完成，状态已设置为: \(appState)")
     }
