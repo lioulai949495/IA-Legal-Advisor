@@ -15,7 +15,7 @@ extension NewCaseWizard {
         case 4:
             if isAnalyzing { return "正在分析……" }
             return agentAnalysisResult == nil ? "开始专业分析" : "下一步"
-        case 5: return "下一步"
+        case 5: return "创建案件"
         default: return "下一步"
         }
     }
