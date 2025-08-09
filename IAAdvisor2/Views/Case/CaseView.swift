@@ -421,6 +421,9 @@ struct CasesListSheet: View {
     @EnvironmentObject var viewModel: AppViewModel
     @Binding var showingCasesList: Bool
     @State private var showingNewCaseSheet = false
+    @State private var caseToDelete: Case? = nil
+    @State private var showingDeleteConfirm = false
+    @StateObject private var docService = CaseDocumentService.shared
     
     var body: some View {
         NavigationView {
@@ -438,6 +441,16 @@ struct CasesListSheet: View {
                             ) {
                                 viewModel.selectCase(caseItem)
                                 showingCasesList = false
+                            }
+                            .contextMenu {
+                                Button("打开") {
+                                    viewModel.selectCase(caseItem)
+                                    showingCasesList = false
+                                }
+                                Button("删除案件", role: .destructive) {
+                                    caseToDelete = caseItem
+                                    showingDeleteConfirm = true
+                                }
                             }
                         }
                     }
@@ -467,6 +480,14 @@ struct CasesListSheet: View {
                 }
             }
             .background(AppTheme.backgroundGradient)
+            .confirmationDialog(
+                "确认删除该案件？\n删除后将同时移除本地已保存的文书与图片，且无法恢复。",
+                isPresented: $showingDeleteConfirm,
+                titleVisibility: .visible
+            ) {
+                Button("确认删除", role: .destructive) { performDelete() }
+                Button("取消", role: .cancel) { caseToDelete = nil }
+            }
         }
         .sheet(isPresented: $showingNewCaseSheet) {
             NewCaseWizard { newCase in
@@ -478,6 +499,21 @@ struct CasesListSheet: View {
         }
     }
     
+    private func performDelete() {
+        guard let item = caseToDelete else { return }
+        let caseId = item.id
+        // 本地文书清理
+        docService.clearCaseDocuments(caseId)
+        // 前端列表移除
+        viewModel.cases.removeAll { $0.id == caseId }
+        if viewModel.selectedCase?.id == caseId {
+            viewModel.selectedCase = viewModel.cases.first
+        }
+        // 后端删除（若未实现则忽略错误）
+        Task { try? await APIService.shared.deleteCase(id: caseId) }
+        // 收尾
+        caseToDelete = nil
+    }
     // 案件统计视图
     private var casesStatsView: some View {
         HStack(spacing: 20) {
