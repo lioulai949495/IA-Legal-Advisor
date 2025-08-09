@@ -12,7 +12,9 @@ extension NewCaseWizard {
         case 1: return "下一步"
         case 2: return iaQuestions.isEmpty ? "开始了解基本情况" : (currentQuestionIndex < iaQuestions.count - 1 ? "下一题" : "完成了解")
         case 3: return "下一步"
-        case 4: return agentAnalysisResult == nil ? "开始专业分析" : "下一步"
+        case 4:
+            if isAnalyzing { return "正在分析……" }
+            return agentAnalysisResult == nil ? "开始专业分析" : "下一步"
         case 5: return "下一步"
         default: return "下一步"
         }
@@ -29,8 +31,8 @@ extension NewCaseWizard {
                 return currentQuestionIndex >= iaQuestions.count || !questionAnswers.isEmpty
             }
         case 3: return true
-        // 步骤5（专业分析）：允许点击“开始专业分析”以启动分析
-        case 4: return true
+        // 步骤5（专业分析）：分析进行中不可点击
+        case 4: return !isAnalyzing
         case 5: return true
         default: return true
         }
@@ -67,6 +69,10 @@ extension NewCaseWizard {
             }
         case 4:
             // 专业分析
+            if isAnalyzing {
+                // 正在分析时忽略点击
+                return
+            }
             if agentAnalysisResult == nil {
                 isAnalyzing = true
                 startAgentAnalysis()
