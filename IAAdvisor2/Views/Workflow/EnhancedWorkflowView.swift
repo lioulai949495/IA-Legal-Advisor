@@ -2,12 +2,15 @@ import SwiftUI
 
 /// 增强的案件流程视图
 struct EnhancedWorkflowView: View {
+    @EnvironmentObject var viewModel: AppViewModel
     @StateObject private var workflowService: CaseWorkflowService
     @State private var selectedStep: EnhancedWorkflowStep?
     @State private var showingStepDetail = false
     @State private var showingCustomStepOptions = false
     @State private var showingPreservationDetail = false
     @State private var selectedStepForCustomAdd: EnhancedWorkflowStep?
+    @State private var showingFullAnalysis = false
+    @State private var fullAnalysisReady = false
     
     let caseType: CaseType
     let onWorkflowUpdate: ([EnhancedWorkflowStep]) -> Void
@@ -1083,6 +1086,7 @@ struct CaseAnalysisDetailSection: View {
             }
             .sheet(isPresented: $showingFullAnalysis) {
                 FullAnalysisReportView()
+                    .onAppear { fullAnalysisReady = true }
             }
         }
     }
@@ -1191,132 +1195,137 @@ struct StrategyPointView: View {
 /// 完整分析报告视图
 struct FullAnalysisReportView: View {
     @Environment(\.dismiss) private var dismiss
+    @State private var isReady: Bool = false
     
     var body: some View {
         NavigationView {
             ZStack {
                 AppTheme.backgroundGradient.ignoresSafeArea()
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 24) {
-                        // 案件概况
-                        VStack(alignment: .leading, spacing: 16) {
-                            Text("📋 案件概况")
-                                .font(.title2.bold())
-                                .foregroundColor(.white)
-                            
-                            VStack(alignment: .leading, spacing: 8) {
-                                InfoRow(label: "案件类型", value: "合同纠纷")
-                                InfoRow(label: "争议金额", value: "¥100,000")
-                                InfoRow(label: "案件复杂度", value: "中等")
-                                InfoRow(label: "预估审理周期", value: "6-12个月")
-                            }
-                            .padding()
-                            .background(
-                                RoundedRectangle(cornerRadius: 12)
-                                    .fill(Color.white.opacity(0.08))
-                            )
-                        }
-                        
-                        // 证据分析
-                        VStack(alignment: .leading, spacing: 16) {
-                            Text("🔍 证据分析")
-                                .font(.title2.bold())
-                                .foregroundColor(.white)
-                            
-                            VStack(alignment: .leading, spacing: 12) {
-                                EvidenceAnalysisCard(
-                                    title: "合同文件",
-                                    strength: "强",
-                                    color: .green,
-                                    analysis: "合同条款清晰，双方签字盖章完整，具有较强的证明力"
-                                )
-                                
-                                EvidenceAnalysisCard(
-                                    title: "聊天记录",
-                                    strength: "中等",
-                                    color: .orange,
-                                    analysis: "能够证明双方沟通过程，但需要进一步公证以增强证明力"
-                                )
-                                
-                                EvidenceAnalysisCard(
-                                    title: "银行转账记录",
-                                    strength: "强",
-                                    color: .green,
-                                    analysis: "银行流水清晰显示付款记录，证明力强"
-                                )
-                            }
-                        }
-                        
-                        // 法律分析
-                        VStack(alignment: .leading, spacing: 16) {
-                            Text("⚖️ 法律分析")
-                                .font(.title2.bold())
-                                .foregroundColor(.white)
-                            
-                            VStack(alignment: .leading, spacing: 12) {
-                                Text("适用法条:")
-                                    .font(.headline)
+                if isReady {
+                    ScrollView {
+                        VStack(alignment: .leading, spacing: 24) {
+                            // 案件概况
+                            VStack(alignment: .leading, spacing: 16) {
+                                Text("📋 案件概况")
+                                    .font(.title2.bold())
                                     .foregroundColor(.white)
                                 
-                                LegalProvisionView(
-                                    title: "《民法典》第577条",
-                                    content: "当事人一方不履行合同义务或者履行合同义务不符合约定的，应当承担继续履行、采取补救措施或者赔偿损失等违约责任。"
-                                )
-                                
-                                LegalProvisionView(
-                                    title: "《民法典》第584条",
-                                    content: "当事人一方不履行合同义务或者履行合同义务不符合约定，造成对方损失的，损失赔偿额应当相当于因违约所造成的损失。"
-                                )
-                            }
-                        }
-                        
-                        // 风险评估
-                        VStack(alignment: .leading, spacing: 16) {
-                            Text("⚠️ 风险评估")
-                                .font(.title2.bold())
-                                .foregroundColor(.white)
-                            
-                            VStack(alignment: .leading, spacing: 12) {
-                                RiskAssessmentCard(
-                                    title: "败诉风险",
-                                    level: "低",
-                                    color: .green,
-                                    probability: "25%",
-                                    description: "证据充分，法律依据明确，败诉风险较低"
-                                )
-                                
-                                RiskAssessmentCard(
-                                    title: "成本风险",
-                                    level: "中等",
-                                    color: .orange,
-                                    probability: "60%",
-                                    description: "诉讼周期可能较长，需考虑时间成本和律师费用"
-                                )
-                                
-                                RiskAssessmentCard(
-                                    title: "执行风险",
-                                    level: "中等",
-                                    color: .orange,
-                                    probability: "40%",
-                                    description: "需要调查对方财产状况，建议考虑诉前保全"
+                                VStack(alignment: .leading, spacing: 8) {
+                                    InfoRow(label: "案件类型", value: "合同纠纷")
+                                    InfoRow(label: "争议金额", value: "¥100,000")
+                                    InfoRow(label: "案件复杂度", value: "中等")
+                                    InfoRow(label: "预估审理周期", value: "6-12个月")
+                                }
+                                .padding()
+                                .background(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .fill(Color.white.opacity(0.08))
                                 )
                             }
-                        }
-                        
-                        // 建议与下一步
-                        VStack(alignment: .leading, spacing: 16) {
-                            Text("🧭 建议与下一步")
-                                .font(.title2.bold())
-                                .foregroundColor(.white)
                             
-                            VStack(alignment: .leading, spacing: 8) {
-                                Text("• 先行调解，准备诉讼材料作为备选")
-                                    .foregroundColor(.white.opacity(0.9))
-                                Text("• 补强证据链，完善损失证明")
-                                    .foregroundColor(.white.opacity(0.9))
+                            // 证据分析
+                            VStack(alignment: .leading, spacing: 16) {
+                                Text("🔍 证据分析")
+                                    .font(.title2.bold())
+                                    .foregroundColor(.white)
+                                
+                                VStack(alignment: .leading, spacing: 12) {
+                                    EvidenceAnalysisCard(
+                                        title: "合同文件",
+                                        strength: "强",
+                                        color: .green,
+                                        analysis: "合同条款清晰，双方签字盖章完整，具有较强的证明力"
+                                    )
+                                    
+                                    EvidenceAnalysisCard(
+                                        title: "聊天记录",
+                                        strength: "中等",
+                                        color: .orange,
+                                        analysis: "能够证明双方沟通过程，但需要进一步公证以增强证明力"
+                                    )
+                                    
+                                    EvidenceAnalysisCard(
+                                        title: "银行转账记录",
+                                        strength: "强",
+                                        color: .green,
+                                        analysis: "银行流水清晰显示付款记录，证明力强"
+                                    )
+                                }
+                            }
+                            
+                            // 法律分析
+                            VStack(alignment: .leading, spacing: 16) {
+                                Text("⚖️ 法律分析")
+                                    .font(.title2.bold())
+                                    .foregroundColor(.white)
+                                
+                                VStack(alignment: .leading, spacing: 12) {
+                                    Text("适用法条:")
+                                        .font(.headline)
+                                        .foregroundColor(.white)
+                                    
+                                    LegalProvisionView(
+                                        title: "《民法典》第577条",
+                                        content: "当事人一方不履行合同义务或者履行合同义务不符合约定的，应当承担继续履行、采取补救措施或者赔偿损失等违约责任。"
+                                    )
+                                    
+                                    LegalProvisionView(
+                                        title: "《民法典》第584条",
+                                        content: "当事人一方不履行合同义务或者履行合同义务不符合约定，造成对方损失的，损失赔偿额应当相当于因违约所造成的损失。"
+                                    )
+                                }
+                            }
+                            
+                            // 风险评估
+                            VStack(alignment: .leading, spacing: 16) {
+                                Text("⚠️ 风险评估")
+                                    .font(.title2.bold())
+                                    .foregroundColor(.white)
+                                
+                                VStack(alignment: .leading, spacing: 12) {
+                                    RiskAssessmentCard(
+                                        title: "败诉风险",
+                                        level: "低",
+                                        color: .green,
+                                        probability: "25%",
+                                        description: "证据充分，法律依据明确，败诉风险较低"
+                                    )
+                                    
+                                    RiskAssessmentCard(
+                                        title: "成本风险",
+                                        level: "中等",
+                                        color: .orange,
+                                        probability: "60%",
+                                        description: "诉讼周期可能较长，需考虑时间成本和律师费用"
+                                    )
+                                    
+                                    RiskAssessmentCard(
+                                        title: "执行风险",
+                                        level: "中等",
+                                        color: .orange,
+                                        probability: "40%",
+                                        description: "需要调查对方财产状况，建议考虑诉前保全"
+                                    )
+                                }
+                            }
+                            
+                            // 建议与下一步
+                            VStack(alignment: .leading, spacing: 16) {
+                                Text("🧭 建议与下一步")
+                                    .font(.title2.bold())
+                                    .foregroundColor(.white)
+                                
+                                VStack(alignment: .leading, spacing: 8) {
+                                    Text("• 先行调解，准备诉讼材料作为备选")
+                                        .foregroundColor(.white.opacity(0.9))
+                                    Text("• 补强证据链，完善损失证明")
+                                        .foregroundColor(.white.opacity(0.9))
+                                }
                             }
                         }
                     }
+                } else {
+                    ProgressView().tint(.white)
                 }
                 .navigationTitle("完整分析报告")
                 .toolbar {
@@ -1326,6 +1335,7 @@ struct FullAnalysisReportView: View {
                 }
             }
             .sheetLargeDetentIfAvailable()
+            .onAppear { isReady = true }
         }
     }
 }
@@ -1335,7 +1345,9 @@ extension View {
     @ViewBuilder
     func sheetLargeDetentIfAvailable() -> some View {
         if #available(iOS 16.0, *) {
-            self.presentationDetents([.large]).presentationDragIndicator(.visible)
+            self
+                .presentationDetents([.large])
+                .presentationDragIndicator(.visible)
         } else {
             self
         }
