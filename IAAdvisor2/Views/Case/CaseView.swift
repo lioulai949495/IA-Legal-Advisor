@@ -10,6 +10,7 @@ struct CaseView: View {
     @State private var selectedWorkflowStep: EnhancedWorkflowStep?
     @State private var showingStepDetail = false
     @State private var showingDocumentsList = false
+    @State private var showingUploadSheet = false
     @State private var selectedTab = 0 // 0: 工作流程, 1: 案件文书
     
     var body: some View {
@@ -47,6 +48,11 @@ struct CaseView: View {
         .sheet(isPresented: $showingDocumentsList) {
             if let selectedCase = viewModel.selectedCase {
                 CaseDocumentListView(caseId: selectedCase.id, caseName: selectedCase.title)
+            }
+        }
+        .sheet(isPresented: $showingUploadSheet) {
+            if let selectedCase = viewModel.selectedCase {
+                DocumentUploadSheet(caseId: selectedCase.id)
             }
         }
     }
@@ -1279,7 +1285,7 @@ struct CompactDocumentCard: View {
                         .multilineTextAlignment(.center)
                     
                     Button("上传文档") {
-                        showingDocumentsList = true
+                        showingUploadSheet = true
                     }
                     .primaryButtonStyle()
                     .frame(maxWidth: 200)
