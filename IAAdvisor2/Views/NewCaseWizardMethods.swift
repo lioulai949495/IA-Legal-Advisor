@@ -13,8 +13,7 @@ extension NewCaseWizard {
         case 2: return iaQuestions.isEmpty ? "开始了解基本情况" : (currentQuestionIndex < iaQuestions.count - 1 ? "下一题" : "完成了解")
         case 3: return "下一步"
         case 4: return agentAnalysisResult == nil ? "开始专业分析" : "下一步"
-        case 5: return generatedWorkflow.isEmpty ? "生成流程" : "下一步"
-        case 6: return "创建案件"
+        case 5: return "下一步"
         default: return "下一步"
         }
     }
@@ -32,8 +31,7 @@ extension NewCaseWizard {
         case 3: return true
         // 步骤5（专业分析）：允许点击“开始专业分析”以启动分析
         case 4: return true
-        case 5: return !generatedWorkflow.isEmpty
-        case 6: return true
+        case 5: return true
         default: return true
         }
     }
@@ -78,17 +76,7 @@ extension NewCaseWizard {
                 }
             }
         case 5:
-            // 生成案件流程
-            if generatedWorkflow.isEmpty {
-                isGeneratingWorkflow = true
-                generateWorkflow()
-            } else {
-                withAnimation {
-                    currentStep = 6
-                }
-            }
-        case 6:
-            // 创建案件并完成
+            // 最后一步：直接创建案件
             createCaseAndStart()
         default:
             break
@@ -204,11 +192,8 @@ extension NewCaseWizard {
         DispatchQueue.main.async {
             self.agentAnalysisResult = analysis
             self.isAnalyzing = false
-            // 分析完成后直接生成流程并跳过“生成流程”步骤，进入“开始执行”
+            // 分析完成后生成流程，但停留在“专业分析”页面，由用户点击“下一步”进入“开始执行”
             self.createWorkflowSteps()
-            withAnimation {
-                self.currentStep = 6
-            }
         }
     }
     

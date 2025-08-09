@@ -373,7 +373,7 @@ extension NewCaseWizard {
         VStack(spacing: 20) {
             // 步骤头部
             VStack(alignment: .leading, spacing: 8) {
-                Text("步骤 5/7")
+                Text("步骤 5/6")
                     .font(.caption)
                     .foregroundColor(.white.opacity(0.7))
                 
