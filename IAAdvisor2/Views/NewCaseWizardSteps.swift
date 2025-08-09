@@ -268,101 +268,25 @@ extension NewCaseWizard {
                             .background(Color.clear)
                             .foregroundColor(.white)
                             .font(.body)
-                            .keyboardToolbar()
-                        
-                        if caseDescription.isEmpty {
-                            Text("请详细描述您遇到的法律问题，包括：\n• 事件的时间、地点、经过\n• 涉及的当事人\n• 争议的核心问题\n• 您希望达到的目标")
-                                .font(.body)
-                                .foregroundColor(.white.opacity(0.5))
-                                .padding(.horizontal, 16)
-                                .padding(.vertical, 20)
-                                .allowsHitTesting(false)
-                        }
+                            // 移除键盘工具栏上的“完成”按钮，避免底部出现“完成”区域
                     }
-                    .background(Color.white.opacity(0.15))
-                    .background(Material.ultraThinMaterial)
-                    .cornerRadius(12)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 12)
-                            .stroke(Color.white.opacity(0.3), lineWidth: 1)
-                    )
+                    
+                    if caseDescription.isEmpty {
+                        Text("请详细描述您遇到的法律问题，包括：\n• 事件的时间、地点、经过\n• 涉及的当事人\n• 争议的核心问题\n• 您希望达到的目标")
+                            .font(.body)
+                            .foregroundColor(.white.opacity(0.5))
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 20)
+                            .allowsHitTesting(false)
+                    }
                 }
-                
-                // 文档上传
-                VStack(alignment: .leading, spacing: 16) {
-                    Text("相关文档")
-                        .font(.headline)
-                        .foregroundColor(.white)
-                    
-                    Button {
-                        showingDocumentPicker = true
-                    } label: {
-                        HStack {
-                            Image(systemName: "plus.circle.fill")
-                                .font(.title2)
-                                .foregroundColor(AppTheme.accentColor)
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text("上传文档或照片")
-                                    .font(.subheadline.bold())
-                                    .foregroundColor(.white)
-                                Text("合同、证据、通信记录等")
-                                    .font(.caption)
-                                    .foregroundColor(.white.opacity(0.7))
-                            }
-                            Spacer()
-                            Image(systemName: "chevron.right")
-                                .foregroundColor(.white.opacity(0.7))
-                        }
-                        .padding()
-                        .background(Color.white.opacity(0.1))
-                        .cornerRadius(12)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 12)
-                                .stroke(Color.white.opacity(0.3), lineWidth: 1)
-                        )
-                    }
-                    
-                    // 已上传文档列表
-                    if !uploadedDocuments.isEmpty {
-                        VStack(spacing: 8) {
-                            ForEach(uploadedDocuments) { document in
-                                HStack {
-                                    Image(systemName: document.type.icon)
-                                        .foregroundColor(.blue)
-                                        .font(.title3)
-                                    
-                                    VStack(alignment: .leading, spacing: 2) {
-                                        Text(document.name)
-                                            .font(.subheadline.bold())
-                                            .foregroundColor(.white)
-                                        Text(document.type.displayName)
-                                            .font(.caption)
-                                            .foregroundColor(.white.opacity(0.7))
-                                    }
-                                    
-                                    Spacer()
-                                    
-                                    Button {
-                                        uploadedDocuments.removeAll { $0.id == document.id }
-                                    } label: {
-                                        Image(systemName: "xmark.circle.fill")
-                                            .foregroundColor(.red)
-                                            .font(.title3)
-                                    }
-                                }
-                                .padding()
-                                .background(Color.white.opacity(0.1))
-                                .cornerRadius(8)
-                            }
-                        }
-                    }
-                    
-                    Text("上传相关文档有助于IA更准确地分析您的案件")
-                        .font(.caption)
-                        .foregroundColor(.white.opacity(0.6))
-                }
-                
-                Spacer(minLength: 100)
+                .background(Color.white.opacity(0.15))
+                .background(Material.ultraThinMaterial)
+                .cornerRadius(12)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(Color.white.opacity(0.3), lineWidth: 1)
+                )
             }
             .padding()
         }
