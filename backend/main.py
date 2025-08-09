@@ -168,6 +168,56 @@ def create_case(request: schemas.CreateCaseRequest, token: str = Depends(verify_
         user_id=row.user_id,
     )
 
+@app.get("/cases/{case_id}", response_model=schemas.CaseResponse)
+def get_case(case_id: str, token: str = Depends(verify_token), db: Session = Depends(get_db)):
+    user_id = token.replace("fake-token-for-", "")
+    row = db.query(models.Case).filter(models.Case.id == case_id, models.Case.user_id == user_id).first()
+    if not row:
+        raise HTTPException(status_code=404, detail="Case not found")
+    return schemas.CaseResponse(
+        id=row.id,
+        title=row.title,
+        description=row.description or "",
+        case_type=row.case_type or "",
+        status=row.status or "active",
+        created_at=row.created_at.isoformat() if row.created_at else "",
+        updated_at=row.updated_at.isoformat() if row.updated_at else "",
+        user_id=row.user_id,
+    )
+
+@app.put("/cases/{case_id}", response_model=schemas.CaseResponse)
+def update_case(case_id: str, request: schemas.UpdateCaseRequest, token: str = Depends(verify_token), db: Session = Depends(get_db)):
+    user_id = token.replace("fake-token-for-", "")
+    row = db.query(models.Case).filter(models.Case.id == case_id, models.Case.user_id == user_id).first()
+    if not row:
+        raise HTTPException(status_code=404, detail="Case not found")
+    if request.title is not None:
+        row.title = request.title
+    if request.description is not None:
+        row.description = request.description
+    db.commit()
+    db.refresh(row)
+    return schemas.CaseResponse(
+        id=row.id,
+        title=row.title,
+        description=row.description or "",
+        case_type=row.case_type or "",
+        status=row.status or "active",
+        created_at=row.created_at.isoformat() if row.created_at else "",
+        updated_at=row.updated_at.isoformat() if row.updated_at else "",
+        user_id=row.user_id,
+    )
+
+@app.delete("/cases/{case_id}")
+def delete_case(case_id: str, token: str = Depends(verify_token), db: Session = Depends(get_db)):
+    user_id = token.replace("fake-token-for-", "")
+    row = db.query(models.Case).filter(models.Case.id == case_id, models.Case.user_id == user_id).first()
+    if not row:
+        raise HTTPException(status_code=404, detail="Case not found")
+    db.delete(row)
+    db.commit()
+    return {"ok": True}
+
 # --- 文档占位接口（仅列表空数组，满足客户端调用） ---
 
 @app.get("/documents", response_model=list[schemas.DocumentResponse])
