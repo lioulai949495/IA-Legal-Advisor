@@ -991,14 +991,7 @@ struct CaseAnalysisView: View {
             }
             .navigationTitle("案件分析")
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("完成") {
-                        dismiss()
-                    }
-                    .foregroundColor(.white)
-                }
-            }
+            // 移除导航栏“完成”按钮，避免与新建案件流程冲突
             .background(AppTheme.backgroundGradient.ignoresSafeArea())
         }
     }
