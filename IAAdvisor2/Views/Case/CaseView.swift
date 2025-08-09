@@ -430,6 +430,7 @@ struct CasesListSheet: View {
             VStack(spacing: 0) {
                 // 顶部统计信息
                 casesStatsView
+                deleteHintView
                 
                 // 案件列表
                 ScrollView {
@@ -497,6 +498,20 @@ struct CasesListSheet: View {
                 showingCasesList = false
             }
         }
+    }
+    
+    private var deleteHintView: some View {
+        HStack(spacing: 6) {
+            Image(systemName: "hand.tap")
+                .font(.caption)
+                .foregroundColor(.white.opacity(0.7))
+            Text("长按删除案件")
+                .font(.caption)
+                .foregroundColor(.white.opacity(0.6))
+            Spacer()
+        }
+        .padding(.horizontal)
+        .padding(.top, 8)
     }
     
     private func performDelete() {
